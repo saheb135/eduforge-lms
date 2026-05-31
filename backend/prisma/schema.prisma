@@ -1,0 +1,131 @@
+// This is the Prisma schema for the LMS project
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum PaymentStatus {
+  ACTIVE
+  EXPIRED
+  PENDING
+}
+
+enum MaterialType {
+  VIDEO
+  PDF
+  DOCUMENT
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(STUDENT)
+  xpPoints  Int      @default(0)
+  streak    Int      @default(0)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  coursesTeaching Course[]      @relation("InstructorCourses")
+  enrollments     Enrollment[]
+  attendance      Attendance[]
+  materialsUploaded Material[]  @relation("UploaderMaterials")
+
+  @@index([email])
+  @@index([role])
+}
+
+model Course {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  subject      String
+  monthlyPrice Float
+  thumbnailUrl String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  instructor   User         @relation("InstructorCourses", fields: [instructorId], references: [id], onDelete: Cascade)
+  instructorId String
+  enrollments  Enrollment[]
+  materials    Material[]
+  attendance   Attendance[]
+
+  @@index([instructorId])
+  @@index([subject])
+}
+
+model Enrollment {
+  id               String        @id @default(cuid())
+  paymentStatus    PaymentStatus @default(PENDING)
+  lastPaymentDate  DateTime?
+  nextPaymentDue   DateTime?
+  amountPaid       Float         @default(0)
+  transactionId    String?       @unique
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  // Relations
+  student   User   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId String
+  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId  String
+
+  @@unique([studentId, courseId])
+  @@index([studentId])
+  @@index([courseId])
+  @@index([paymentStatus])
+}
+
+model Material {
+  id         String       @id @default(cuid())
+  title      String
+  type       MaterialType
+  sourceUrl  String
+  duration   Int?         // in minutes for videos
+  uploadedAt DateTime     @default(now())
+
+  // Relations
+  course     Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId   String
+  uploadedBy User   @relation("UploaderMaterials", fields: [uploaderId], references: [id])
+  uploaderId String
+
+  @@index([courseId])
+  @@index([type])
+}
+
+model Attendance {
+  id                 String   @id @default(cuid())
+  lecturesAttended   Int      @default(0)
+  totalLectures      Int      @default(0)
+  progressPercentage Float    @default(0)
+  lastAccessed       DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Relations
+  student   User   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId String
+  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId  String
+
+  @@unique([studentId, courseId])
+  @@index([studentId])
+  @@index([courseId])
+}
