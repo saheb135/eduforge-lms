@@ -73,12 +73,14 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-950 flex">
-      <Sidebar activePage="/dashboard" />
+    <div className="min-h-screen bg-surface-950 flex flex-col lg:flex-row">
+      <div className="hidden lg:flex">
+        <Sidebar activePage="/dashboard" />
+      </div>
 
       <div className="flex-1 overflow-auto">
         {/* Top bar */}
-        <div className="sticky top-0 z-20 px-8 py-4 border-b border-slate-800 flex items-center justify-between"
+        <div className="sticky top-0 z-20 px-4 lg:px-8 py-4 border-b border-slate-800 flex items-center justify-between"
           style={{ background: 'rgba(2,6,23,0.9)', backdropFilter: 'blur(12px)' }}>
           <div>
             <h1 className="text-xl font-bold text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
