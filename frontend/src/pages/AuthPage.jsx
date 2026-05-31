@@ -43,7 +43,7 @@ export default function AuthPage() {
   const handleChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Panel - Aesthetic */}
       <div className="hidden lg:flex flex-1 relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #020617 0%, #0f172a 40%, #1e1b4b 100%)' }}>
@@ -121,7 +121,7 @@ export default function AuthPage() {
       </div>
 
       {/* Right Panel - Form */}
-      <div className="flex-1 lg:max-w-md flex items-center justify-center p-8 bg-surface-950 relative">
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 bg-surface-950 relative min-h-screen">
         <div className="w-full max-w-sm space-y-8 animate-fade-in">
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center gap-2 justify-center">
